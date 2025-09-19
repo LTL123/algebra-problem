@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra Problems </title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+        }
+
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .problem-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .problem-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #f0f0f0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .problem-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .feedback-section {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 15px;
+        }
+
+        .feedback-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 15px;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .difficulty-btn.easy {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .difficulty-btn.medium {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .difficulty-btn.hard {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .difficulty-btn.selected {
+            border-color: #333;
+            box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.3);
+        }
+
+
+
+
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Image Modal Styles */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .image-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 95%;
+            max-height: 95%;
+            margin: auto;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-info {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            color: white;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+
+
+
+        /* Answer Input Styles */
+        .answer-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .answer-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .answer-status {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .submit-answer-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .submit-answer-btn:hover {
+            background: #218838;
+        }
+
+        .submit-answer-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .problems-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .difficulty-buttons {
+                flex-direction: column;
+            }
+            
+            .difficulty-btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <img class="modal-image" id="modalImage" src="" alt="">
+            <div class="modal-info" id="modalInfo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Grade 7 Algebra Problems</h1>
+            <p>Week 3 - Interactive Problem Set with Difficulty Feedback</p>
+            
+
+        </div>
+
+        <div class="problems-grid" id="problemsGrid">
+            <!-- Problems will be dynamically loaded here -->
+        </div>
+
+
+
+
+    </div>
+
+    <script>
+
+        // Problem images array
+        const problemImages = [
+            'Screenshot 2025-09-19 at 10.55.06.png',
+            'Screenshot 2025-09-19 at 10.55.11.png',
+            'Screenshot 2025-09-19 at 10.55.15.png',
+            'Screenshot 2025-09-19 at 10.55.21.png',
+            'Screenshot 2025-09-19 at 10.55.26.png',
+            'Screenshot 2025-09-19 at 10.55.29.png',
+            'Screenshot 2025-09-19 at 10.55.42.png',
+            'Screenshot 2025-09-19 at 10.55.50.png',
+            'Screenshot 2025-09-19 at 10.55.54.png',
+            'Screenshot 2025-09-19 at 10.55.58.png',
+            'Screenshot 2025-09-19 at 10.56.01.png',
+            'Screenshot 2025-09-19 at 10.56.04.png',
+            'Screenshot 2025-09-19 at 10.56.10.png',
+            'Screenshot 2025-09-19 at 10.56.16.png',
+            'Screenshot 2025-09-19 at 10.56.22.png',
+            'Screenshot 2025-09-19 at 10.56.25.png',
+            'Screenshot 2025-09-19 at 10.56.32.png',
+            'Screenshot 2025-09-19 at 10.56.37.png',
+            'Screenshot 2025-09-19 at 10.56.40.png',
+            'Screenshot 2025-09-19 at 10.56.44.png',
+            'Screenshot 2025-09-19 at 10.56.50.png',
+            'Screenshot 2025-09-19 at 10.56.55.png',
+            'Screenshot 2025-09-19 at 10.56.59.png',
+            'Screenshot 2025-09-19 at 10.57.03.png',
+            'Screenshot 2025-09-19 at 10.57.07.png',
+            'Screenshot 2025-09-19 at 10.57.33.png',
+            'Screenshot 2025-09-19 at 10.57.37.png',
+            'Screenshot 2025-09-19 at 10.57.41.png',
+            'Screenshot 2025-09-19 at 10.57.47.png',
+            'Screenshot 2025-09-19 at 10.57.51.png',
+            'Screenshot 2025-09-19 at 10.57.55.png',
+            'Screenshot 2025-09-19 at 10.58.06.png',
+            'Screenshot 2025-09-19 at 10.58.11.png',
+            'Screenshot 2025-09-19 at 10.58.15.png',
+            'Screenshot 2025-09-19 at 10.58.18.png',
+            'Screenshot 2025-09-19 at 10.58.25.png',
+            'Screenshot 2025-09-19 at 10.58.28.png',
+            'Screenshot 2025-09-19 at 10.58.34.png',
+            'Screenshot 2025-09-19 at 10.58.41.png',
+            'Screenshot 2025-09-19 at 10.58.48.png',
+            'Screenshot 2025-09-19 at 10.58.51.png',
+            'Screenshot 2025-09-19 at 10.58.55.png',
+            'Screenshot 2025-09-19 at 10.59.00.png',
+            'Screenshot 2025-09-19 at 10.59.07.png',
+            'Screenshot 2025-09-19 at 10.59.11.png',
+            'Screenshot 2025-09-19 at 10.59.15.png',
+            'Screenshot 2025-09-19 at 10.59.21.png',
+            'Screenshot 2025-09-19 at 10.59.24.png',
+            'Screenshot 2025-09-19 at 10.59.29.png',
+            'Screenshot 2025-09-19 at 10.59.45.png',
+            'Screenshot 2025-09-19 at 10.59.48.png',
+            'Screenshot 2025-09-19 at 10.59.51.png',
+            'Screenshot 2025-09-19 at 10.59.55.png',
+            'Screenshot 2025-09-19 at 11.00.04.png',
+            'Screenshot 2025-09-19 at 11.00.08.png',
+            'Screenshot 2025-09-19 at 11.00.11.png',
+            'Screenshot 2025-09-19 at 11.00.14.png',
+            'Screenshot 2025-09-19 at 11.00.18.png',
+            'Screenshot 2025-09-19 at 11.00.25.png',
+            'Screenshot 2025-09-19 at 11.00.29.png',
+            'Screenshot 2025-09-19 at 11.00.34.png',
+            'Screenshot 2025-09-19 at 11.00.38.png',
+            'Screenshot 2025-09-19 at 11.00.44.png',
+            'Screenshot 2025-09-19 at 11.00.49.png',
+            'Screenshot 2025-09-19 at 11.00.52.png',
+            'Screenshot 2025-09-19 at 11.00.57.png',
+            'Screenshot 2025-09-19 at 11.01.00.png',
+            'Screenshot 2025-09-19 at 11.01.05.png',
+            'Screenshot 2025-09-19 at 11.01.09.png',
+            'Screenshot 2025-09-19 at 11.01.12.png',
+            'Screenshot 2025-09-19 at 11.01.18.png'
+        ];
+
+        // Global variables
+
+
+
+        // Update connection status indicator
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.className = 'connection-status connected';
+                statusElement.innerHTML = '✓ Connected to LeanCloud';
+            } else {
+                statusElement.className = 'connection-status disconnected';
+                statusElement.innerHTML = '✗ LeanCloud Connection Failed';
+            }
+        }
+
+        // Create problem card HTML
+        function createProblemCard(imageName, index) {
+            return `
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <div class="problem-number">Problem ${index + 1}</div>
+                    </div>
+                    <img src="Algebra problems/${imageName}" alt="Problem ${index + 1}" class="problem-image" loading="lazy" onclick="openImageModal('Algebra problems/${imageName}', 'Problem ${index + 1}')">
+                    
+                    <!-- Answer Section -->
+                    <div class="answer-section">
+                        <label for="answer-${index}" style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">
+                            你的答案:
+                        </label>
+                        <textarea 
+                            id="answer-${index}" 
+                            class="answer-input" 
+                            placeholder="请在此输入你的答案..."
+                            onchange="saveAnswerLocally(${index}, this.value)"
+                        ></textarea>
+                        <div class="answer-controls">
+                            <div class="answer-status" id="answer-status-${index}">
+                                未保存
+                            </div>
+                            <button class="submit-answer-btn" onclick="submitAnswer(${index})">
+                                提交答案
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-section">
+                        <div class="feedback-title">Rate the difficulty:</div>
+                        <div class="difficulty-buttons">
+                            <button class="difficulty-btn easy" onclick="submitFeedback(${index}, 'easy', this)">
+                                Easy
+                            </button>
+                            <button class="difficulty-btn medium" onclick="submitFeedback(${index}, 'medium', this)">
+                                Medium
+                            </button>
+                            <button class="difficulty-btn hard" onclick="submitFeedback(${index}, 'hard', this)">
+                                Hard
+                            </button>
+                        </div>
+                        <div class="feedback-status" id="feedback-status-${index}" style="display: none;"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Submit feedback
+        function submitFeedback(problemIndex, difficulty, buttonElement) {
+            const statusElement = document.getElementById(`feedback-status-${problemIndex}`);
+            const buttonsContainer = buttonElement.parentElement;
+
+            // Show loading state
+            statusElement.style.display = 'block';
+            statusElement.className = 'feedback-status loading';
+            statusElement.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+            // Clear previous selections
+            buttonsContainer.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Mark current selection
+            buttonElement.classList.add('selected');
+
+            try {
+                saveFeedbackLocally(problemIndex, difficulty);
+                statusElement.className = 'feedback-status success';
+                statusElement.innerHTML = '✓ Feedback saved locally';
+                console.log(`Feedback saved locally for problem ${problemIndex + 1}: ${difficulty}`);
+            } catch (localError) {
+                console.error('Error saving feedback locally:', localError);
+                statusElement.className = 'feedback-status error';
+                statusElement.innerHTML = '✗ Failed to save feedback. Please try again.';
+                buttonElement.classList.remove('selected');
+            }
+        }
+
+        // Save feedback to local storage as fallback
+        function saveFeedbackLocally(problemIndex, difficulty) {
+            const feedbackData = {
+                problemIndex: problemIndex,
+                problemImage: problemImages[problemIndex],
+                difficulty: difficulty,
+                timestamp: new Date().toISOString(),
+                sessionId: getSessionId()
+            };
+            
+            let localFeedback = JSON.parse(localStorage.getItem('algebraFeedback') || '[]');
+            // Remove any existing feedback for the same problem
+            localFeedback = localFeedback.filter(item => item.problemIndex !== problemIndex);
+            localFeedback.push(feedbackData);
+            localStorage.setItem('algebraFeedback', JSON.stringify(localFeedback));
+        }
+
+        // Load saved feedback from local storage
+        function loadSavedFeedback() {
+            const localFeedback = JSON.parse(localStorage.getItem('algebraFeedback') || '[]');
+            localFeedback.forEach(feedback => {
+                const { problemIndex, difficulty } = feedback;
+                const button = document.querySelector(`.problem-card[data-problem-index='${problemIndex}'] .difficulty-btn.${difficulty}`);
+                if (button) {
+                    button.classList.add('selected');
+                }
+            });
+        }
+
+
+
+        // Get or create session ID
+        function getSessionId() {
+            let sessionId = localStorage.getItem('algebraSessionId');
+            if (!sessionId) {
+                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('algebraSessionId', sessionId);
+            }
+            return sessionId;
+        }
+
+
+
+        // Image Modal Functions
+        function openImageModal(imageSrc, problemTitle) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalInfo = document.getElementById('modalInfo');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = problemTitle;
+            modalInfo.textContent = problemTitle + ' - Click to close';
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Initialize the application
+        async function initializeApp() {
+            // Generate problem cards
+            const problemsGrid = document.getElementById('problemsGrid');
+            problemsGrid.innerHTML = problemImages.map((imageName, index) => 
+                createProblemCard(imageName, index)
+            ).join('');
+            
+            // Load saved answers
+            loadSavedAnswers();
+            loadSavedFeedback();
+            
+            // Set up modal event listeners
+            setupModalEventListeners();
+            
+            console.log('Application initialized successfully');
+        }
+
+        // Set up modal event listeners
+        function setupModalEventListeners() {
+            const modal = document.getElementById('imageModal');
+            const modalClose = document.getElementById('modalClose');
+            
+            // Close modal when clicking the X button
+            modalClose.addEventListener('click', closeImageModal);
+            
+            // Close modal when clicking outside the image
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeImageModal();
+                }
+            });
+            
+            // Close modal when pressing Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && modal.classList.contains('show')) {
+                    closeImageModal();
+                }
+            });
+        }
+
+        // Answer Management Functions
+        function saveAnswerLocally(problemIndex, answer) {
+            const answers = JSON.parse(localStorage.getItem('studentAnswers') || '{}');
+            answers[problemIndex] = {
+                answer: answer,
+                timestamp: new Date().toISOString(),
+                problemNumber: problemIndex + 1
+            };
+            localStorage.setItem('studentAnswers', JSON.stringify(answers));
+            
+            const statusElement = document.getElementById(`answer-status-${problemIndex}`);
+            if (statusElement) {
+                statusElement.textContent = '已本地保存';
+                statusElement.style.color = '#28a745';
+            }
+        }
+
+        async function submitAnswer(problemIndex) {
+            const answerInput = document.getElementById(`answer-${problemIndex}`);
+            const answer = answerInput.value.trim();
+            
+            if (!answer) {
+                alert('请先输入答案');
+                return;
+            }
+
+            const statusElement = document.getElementById(`answer-status-${problemIndex}`);
+            const submitBtn = answerInput.parentElement.querySelector('.submit-answer-btn');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '提交中...';
+                statusElement.textContent = '正在上传...';
+                statusElement.style.color = '#007bff';
+
+                // Create answer object for LeanCloud
+                const AnswerObject = AV.Object.extend('StudentAnswers');
+                const answerObj = new AnswerObject();
+                
+                answerObj.set('problemNumber', problemIndex + 1);
+                answerObj.set('answer', answer);
+                answerObj.set('sessionId', sessionId);
+                answerObj.set('timestamp', new Date());
+                
+                // Set public read/write ACL
+                const acl = new AV.ACL();
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                answerObj.setACL(acl);
+
+                await answerObj.save();
+                
+                statusElement.textContent = '已上传到云端';
+                statusElement.style.color = '#28a745';
+                submitBtn.textContent = '重新提交';
+                
+                console.log(`Answer for problem ${problemIndex + 1} uploaded successfully`);
+                
+            } catch (error) {
+                console.error('Error uploading answer:', error);
+                statusElement.textContent = '上传失败，已保存到本地';
+                statusElement.style.color = '#dc3545';
+                submitBtn.textContent = '重试上传';
+                
+                // Save to local storage as fallback
+                saveAnswerLocally(problemIndex, answer);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+
+
+        // Load saved answers when page loads
+        function loadSavedAnswers() {
+            const savedAnswers = JSON.parse(localStorage.getItem('studentAnswers') || '{}');
+            
+            Object.entries(savedAnswers).forEach(([index, data]) => {
+                const answerInput = document.getElementById(`answer-${index}`);
+                const statusElement = document.getElementById(`answer-status-${index}`);
+                
+                if (answerInput && data.answer) {
+                    answerInput.value = data.answer;
+                    if (statusElement) {
+                        statusElement.textContent = '已本地保存';
+                        statusElement.style.color = '#28a745';
+                    }
+                }
+            });
+        }
+
+
+
+        // Start the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
